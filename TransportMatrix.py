@@ -55,22 +55,21 @@ class TransportMatrix:
     def get_min_free_place(self) -> tuple:
         coefficients = copy.deepcopy(self._coefficient_matrix)
 
-        row_to_remove = []
-
         while True:
             mins = [min(row) for row in coefficients]
             min_value = min(mins)
-            if min_value == 10**18:
+            if min_value == 10 ** 18:
                 return -1, -1
             row = mins.index(min_value)
             column = coefficients[row].index(min_value)
 
-            if self._value_matrix[row][column] > 0 or sum(self._value_matrix[row]) >= self._a_values[row]\
+            if self._value_matrix[row][column] > 0 or sum(self._value_matrix[row]) >= self._a_values[row] \
                     or MatrixUtils.column_sum(column, self._value_matrix) >= self._b_values[column]:
                 coefficients[row][column] = 10 ** 18
             else:
                 return row, column
 
     def _validate_value(self, column: int, row: int, value: int) -> bool:
-        return MatrixUtils.column_sum(column, self._value_matrix) + value <= self._b_values[column] and \
-               sum(self._value_matrix[row]) + value <= self._a_values[row]
+        return MatrixUtils.column_sum(column, self._value_matrix) - self._value_matrix[row][column] + value <= \
+               self._b_values[column] and sum(self._value_matrix[row]) - self._value_matrix[row][column] + value \
+               <= self._a_values[row]
